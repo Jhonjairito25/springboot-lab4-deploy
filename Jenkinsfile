@@ -1,46 +1,50 @@
+
 pipeline {
     agent any
 
     environment {
-        VM_USER = 'deploy'
-        VM_HOST = '192.168.0.77'
-        VM_PATH = '/opt/my-app'
-        JAR_NAME = 'demo-app-0.0.1-SNAPSHOT.jar'
-        SCP_PATH = 'C:\\Windows\\System32\\OpenSSH\\scp.exe'
-        SSH_PATH = 'C:\\Windows\\System32\\OpenSSH\\ssh.exe'
+        // Ruta completa de Maven en Windows
+        MAVEN_HOME = 'C:\\tools\\maven\\apache-maven-3.9.12\\bin'
+        // Ruta del JAR generado
+        JAR_FILE = 'target\\demo-app-0.0.1-SNAPSHOT.jar'
+        // Datos de despliegue
+        DEPLOY_USER = 'deploy'
+        DEPLOY_HOST = '192.168.0.77'
+        DEPLOY_PATH = '/opt/my-app/'
+        // Ruta del archivo de identidad SSH si usas clave privada
+        SSH_KEY = 'C:\\Users\\llano\\.ssh\\id_rsa_deploy' 
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Jhonjairito25/springboot-lab4-deploy.git'
+                echo "📥 Checkout del repositorio"
+                git url: 'https://github.com/Jhonjairito25/springboot-lab4-deploy.git', branch: 'main', credentialsId: 'deploy-ssh-key'
             }
         }
 
         stage('Build') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                echo "🔨 Compilando con Maven"
+                bat "\"${env.MAVEN_HOME}\\mvn.cmd\" clean package -DskipTests"
             }
         }
 
         stage('Deploy to VM') {
             steps {
-                echo "📤 Copiando JAR al servidor remoto..."
-                bat "${env.SCP_PATH} target\\${JAR_NAME} ${VM_USER}@${VM_HOST}:${VM_PATH}/"
-                
-                echo "🚀 Ejecutando deploy remoto..."
-                bat "${env.SSH_PATH} ${VM_USER}@${VM_HOST} \"cd ${VM_PATH} && ./deploy.sh ${JAR_NAME}\""
+                echo "🚀 Copiando JAR a la VM"
+                // Usando SCP con clave SSH
+                bat "scp -i ${env.SSH_KEY} ${env.JAR_FILE} ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:${env.DEPLOY_PATH}"
             }
         }
     }
 
     post {
         success {
-            echo "✅ Deploy completado correctamente!"
+            echo "✅ Pipeline completado correctamente"
         }
         failure {
-            echo "❌ Algo falló en el pipeline. Revisa los logs."
+            echo "❌ Algo falló en el pipeline. Revisa los logs"
         }
     }
 }
