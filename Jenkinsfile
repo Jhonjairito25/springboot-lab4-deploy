@@ -12,20 +12,24 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/Jhonjairito25/springboot-lab4-deploy.git'
+                    url: 'https://github.com/Jhonjairito25/springboot-lab4-deploy.git',
+                    credentialsId: 'deploy-ssh-key'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Deploy to VM') {
             steps {
-                sh "scp target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${VM_PATH}/"
-                sh "ssh ${VM_USER}@${VM_HOST} 'cd ${VM_PATH} && ./deploy.sh ${JAR_NAME}'"
+                // Copiar JAR a la VM
+                bat "scp target\\${JAR_NAME} ${VM_USER}@${VM_HOST}:${VM_PATH}/"
+
+                // Ejecutar deploy.sh en la VM
+                bat "ssh ${VM_USER}@${VM_HOST} \"cd ${VM_PATH} && ./deploy.sh ${JAR_NAME}\""
             }
         }
     }
