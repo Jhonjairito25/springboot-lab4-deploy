@@ -4,15 +4,18 @@ pipeline {
     environment {
         // Ruta completa de Maven en Windows
         MAVEN_HOME = 'C:\\tools\\maven\\apache-maven-3.9.12\\bin'
-        PATH = "${env.MAVEN_HOME};${env.PATH}" // Agrega Maven al PATH temporalmente
+        PATH = "${env.MAVEN_HOME};${env.PATH}" // agrega Maven al PATH temporalmente
+
         // Ruta del JAR generado
         JAR_FILE = 'target\\demo-app-0.0.1-SNAPSHOT.jar'
+
         // Datos de despliegue
         DEPLOY_USER = 'deploy'
         DEPLOY_HOST = '192.168.0.77'
         DEPLOY_PATH = '/opt/my-app/'
+
         // Ruta del archivo de identidad SSH
-        SSH_KEY = 'C:\\Users\\llano\\.ssh\\id_rsa_deploy'
+        SSH_KEY = 'C:\\Users\\llano\\.ssh\\id_rsa'
     }
 
     stages {
@@ -34,16 +37,16 @@ pipeline {
             }
         }
 
-      stage('Deploy to VM') {
-    steps {
-        echo "🚀 Copiando JAR a la VM"
-        bat """
-        echo Usando SCP para transferir el JAR
-        C:\\Windows\\System32\\OpenSSH\\scp.exe -i "${SSH_KEY}" "${JAR_FILE}" ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
-        """
+        stage('Deploy to VM') {
+            steps {
+                echo "🚀 Copiando JAR a la VM"
+                bat """
+                echo Usando SCP para transferir el JAR
+                C:\\Windows\\System32\\OpenSSH\\scp.exe -i "${SSH_KEY}" "${JAR_FILE}" ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
+                """
+            }
+        }
     }
-}
-
 
     post {
         success {
