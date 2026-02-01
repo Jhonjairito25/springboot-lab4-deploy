@@ -18,13 +18,19 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                // Usa la instalación de Maven configurada en Jenkins -> Global Tool Configuration
+                withMaven(maven: 'Maven3') {
+                    bat 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Deploy to VM') {
             steps {
+                // Copiar el JAR a la VM
                 bat "scp target\\${JAR_NAME} ${VM_USER}@${VM_HOST}:${VM_PATH}/"
+                
+                // Ejecutar deploy.sh en la VM
                 bat "ssh ${VM_USER}@${VM_HOST} \"cd ${VM_PATH} && ./deploy.sh ${JAR_NAME}\""
             }
         }
