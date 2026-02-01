@@ -34,16 +34,16 @@ pipeline {
             }
         }
 
-        stage('Deploy to VM') {
-            steps {
-                echo "🚀 Copiando JAR a la VM"
-                bat """
-                echo Usando SCP para transferir el JAR
-                scp -i "${SSH_KEY}" "${JAR_FILE}" ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
-                """
-            }
-        }
+      stage('Deploy to VM') {
+    steps {
+        echo "🚀 Copiando JAR a la VM"
+        bat """
+        echo Usando SCP para transferir el JAR
+        C:\\Windows\\System32\\OpenSSH\\scp.exe -i "${SSH_KEY}" "${JAR_FILE}" ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
+        """
     }
+}
+
 
     post {
         success {
