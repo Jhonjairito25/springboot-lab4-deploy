@@ -2,9 +2,14 @@ pipeline {
     agent any
 
     environment {
+        // Ruta completa de Maven en Windows
         MAVEN_HOME = 'C:\\tools\\maven\\apache-maven-3.9.12\\bin'
-        PATH = "${env.MAVEN_HOME};${env.PATH}"
+        PATH = "${env.MAVEN_HOME};${env.PATH}" // agrega Maven al PATH temporalmente
+
+        // Ruta del JAR generado
         JAR_FILE = 'target\\demo-app-0.0.1-SNAPSHOT.jar'
+
+        // Datos de despliegue
         DEPLOY_USER = 'deploy'
         DEPLOY_HOST = '192.168.0.77'
         SSH_KEY = 'C:\\Users\\llano\\.ssh\\id_rsa'
