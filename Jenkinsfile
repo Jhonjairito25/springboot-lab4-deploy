@@ -12,6 +12,9 @@ pipeline {
         // Datos de despliegue
         DEPLOY_USER = 'deploy'
         DEPLOY_HOST = '192.168.0.77'
+        DEPLOY_PATH = '/opt/my-app/'
+
+        // Ruta del archivo de identidad SSH
         SSH_KEY = 'C:\\Users\\llano\\.ssh\\id_rsa'
     }
 
@@ -36,13 +39,10 @@ pipeline {
 
         stage('Deploy to VM') {
             steps {
-                echo "🚀 Copiando JAR a /tmp de la VM"
+                echo "🚀 Copiando JAR a la VM"
                 bat """
-                C:\\Windows\\System32\\OpenSSH\\scp.exe -i "${SSH_KEY}" "${JAR_FILE}" ${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/app.jar
-                """
-                echo "🚀 Ejecutando deploy.sh en la VM"
-                bat """
-                ssh -i "${SSH_KEY}" ${DEPLOY_USER}@${DEPLOY_HOST} "bash /opt/my-app/deploy.sh /tmp/app.jar"
+                echo Usando SCP para transferir el JAR
+                C:\\Windows\\System32\\OpenSSH\\scp.exe -i "${SSH_KEY}" "${JAR_FILE}" ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
                 """
             }
         }
